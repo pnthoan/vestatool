@@ -73,8 +73,18 @@ export default {
         },
         {
           icon: 'mdi-chart-bubble',
-          title: 'Thêm Công Thức',
-          to: '/inspire'
+          title: 'Giấy',
+          to: '/giay'
+        },
+        {
+          icon: 'mdi-chart-bubble',
+          title: 'Hộp',
+          to: '/hop'
+        },
+        {
+          icon: 'mdi-chart-bubble',
+          title: 'Nhân Viên',
+          to: '/nhanvien'
         }
       ],
       miniVariant: false,

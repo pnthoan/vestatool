@@ -154,6 +154,7 @@
     ],
     methods: {
       onClose() {
+        console.log("onClose function!");
         this.loaihop = 'Hộp thường';
         this.loaigiay = 'Giấy 2N1X';
         this.chieudai = 0;
@@ -164,6 +165,11 @@
         this.soluongmau = 0;
         this.khuon = false;
         this.giakhuon = 0;
+      }, 
+
+      onSubmit()
+      {
+        console.log("On Submit function!");
       }
     }
   };
