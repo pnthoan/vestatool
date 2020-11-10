@@ -4,7 +4,7 @@ export default {
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     titleTemplate: '%s',
-    title: 'ebox',
+    title: 'Ebox',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -14,7 +14,9 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
-
+  server: {
+    port: 8080 // default: 3000
+  },
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
   ],

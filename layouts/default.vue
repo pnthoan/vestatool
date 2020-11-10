@@ -16,7 +16,7 @@
           exact
         >
           <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
+            <v-icon style="color:#1E88E5">{{ item.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title v-text="item.title" />
@@ -39,10 +39,12 @@
       </v-btn>
       <v-toolbar-title style="color:#3f51b5;" v-text="title" />
       <vuetify-logo />
+      <v-spacer></v-spacer>
+      <v-btn icon><v-icon>mdi-logout-variant</v-icon></v-btn>
     </v-app-bar>
 
     <v-main>
-      <v-container>
+      <v-container style="width:100%;max-width:100%">
         <nuxt />
       </v-container>
     </v-main>
@@ -69,20 +71,20 @@ export default {
         {
           icon: 'mdi-apps',
           title: 'Tính Giá',
-          to: '/'
+          to: '/tinhgia'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-note-outline',
           title: 'Giấy',
           to: '/giay'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-dropbox',
           title: 'Hộp',
           to: '/hop'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-account-group',
           title: 'Nhân Viên',
           to: '/nhanvien'
         }
@@ -96,3 +98,8 @@ export default {
   }
 };
 </script>
+<style type="text/css">
+.v-btn--round .v-btn__content .v-icon {
+  color: #1E88E5;
+}
+</style>
