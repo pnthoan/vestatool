@@ -11,7 +11,6 @@
   <v-data-table
     :headers="headers"
     :items="desserts"
-    class="dataitem"
   >
     <template v-slot:top>
         <v-dialog
@@ -98,14 +97,6 @@
       </v-btn>
       <v-btn small class="mr-2" outlined fab color="primary" @click="deleteItem(item)">
         <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
-      </v-btn>
-    </template>
-    <template v-slot:no-data>
-      <v-btn
-        color="primary"
-        @click="initialize"
-      >
-        Reset
       </v-btn>
     </template>
   </v-data-table>
@@ -246,49 +237,49 @@
   padding: 0 0px !important;
   width: 10%;
   color: #3f51b5 !important;
-  text-align: center !important;
+  text-align: left !important;
   background-color: LightGray !important;
 }
 .name-size {
   padding: 0 0px !important;
   width: 15%;
   color: #3f51b5 !important;
-  text-align: center !important;
+  text-align: left !important;
   background-color: LightGray !important;
 }
 .role-size {
   padding: 0 0px !important;
   width: 10%;
   color: #3f51b5 !important;
-  text-align: center !important;
+  text-align: left !important;
   background-color: LightGray !important;
 }
 .email-size {
   padding: 0 0px !important;
   width: 15%;
   color: #3f51b5 !important;
-  text-align: center !important;
+  text-align: left !important;
   background-color: LightGray !important;
 }
 .phone-size {
   padding: 0 0px !important;
   width: 10%;
   color: #3f51b5 !important;
-  text-align: center !important;
+  text-align: left !important;
   background-color: LightGray !important;
 }
 .add-size {
   padding: 0 0px !important;
   width: 20%;
   color: #3f51b5 !important;
-  text-align: center !important;
+  text-align: left !important;
   background-color: LightGray !important;
 }
 .actions-size {
   padding: 0 0px !important;
   width: 10%;
   color: #3f51b5 !important;
-  text-align: center !important;
+  text-align: left !important;
   background-color: LightGray !important;
 }
 

@@ -10,8 +10,7 @@
   <br>
   <v-data-table
     :headers="headers"
-    :items="desserts"
-    class="dataitem"
+    :items="items"
   >
     <template v-slot:top>
         <v-dialog
@@ -28,45 +27,20 @@
                 <v-row>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.username"
-                      label="Username"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col v-if="editedIndex==-1" cols="12" sm="6" md="4">
-                    <v-text-field
-                      v-model="editedItem.password"
-                      label="Password"
+                      v-model="editedItem.ma_giay"
+                      label="Mã Giấy"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.name"
-                      label="Name"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-select
-                      v-model="editedItem.role"
-                      :items="roles"
-                      label="Role"
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field
-                      v-model="editedItem.email"
-                      label="Email"
+                      v-model="editedItem.ten_giay"
+                      label="Tên Giấy"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.phone"
-                      label="Phone"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="editedItem.address"
-                      label="Address"
+                      v-model="editedItem.don_gia"
+                      label="Đơn Giá"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -100,14 +74,6 @@
         <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
       </v-btn>
     </template>
-    <template v-slot:no-data>
-      <v-btn
-        color="primary"
-        @click="initialize"
-      >
-        Reset
-      </v-btn>
-    </template>
   </v-data-table>
   </div>
 </template>
@@ -118,34 +84,23 @@
       dialog: false,
       dialogDelete: false,
       headers: [
-        { text: 'Username', value: 'username', class: 'username-size'},
-        { text: 'Name', value: 'name', class: 'name-size'},
-        { text: 'Role', value: 'role', class: 'role-size' },
-        { text: 'Email', value: 'email', class: 'email-size' },
-        { text: 'Phone', value: 'phone', class: 'phone-size' },
-        { text: 'Address', value: 'address', class: 'add-size'},
-        { text: 'Actions', value: 'actions', class: 'actions-size', sortable: false }
+        { text: 'Mã Giấy', value: 'ma_giay', class: 'ma-giay-class'},
+        { text: 'Tên Giấy', value: 'ten_giay', class: 'ten-giay-class' },
+        { text: 'Đơn Giá', value: 'don_gia', class: 'don-gia-class'},
+        { text: 'Actions', value: 'actions', class: 'actions-class', sortable: false }
       ],
-      roles: ['Admin', 'Member'],
-      desserts: [],
+      items: [],
       editedIndex: -1,
       editedItem: {
-        username: '',
-        password: '',
-        name: '',
-        role: '',
-        email: '',
-        phone: '',
-        address: ''
+        ma_giay: '',
+        ten_giay: '',
+        don_gia: 0.0
       },
+
       defaultItem: {
-        username: '',
-        password: '',
-        name: '',
-        role: '',
-        email: '',
-        phone: '',
-        address: ''
+        ma_giay: '',
+        ten_giay: '',
+        don_gia: 0.0
       },
     }),
 
@@ -170,22 +125,16 @@
 
     methods: {
       initialize () {
-        this.desserts = [
+        this.items = [
           {
-            username : 'pnthoan',
-            name : 'Pham Ngoc Thoan',
-            role : 'Admin',
-            email : 'pnthoan@gmail.com',
-            phone : '0932159064',
-            address : 'Binh Phuoc'
+            ma_giay: '2N3X',
+            ten_giay: 'Giấy 5 lớp 2N3X',
+            don_gia: 9700
           },
           {
-            username : 'ntlhuyen',
-            name : 'Nguyen Thi Le Huyen',
-            role : 'Member',
-            email : 'ntlhuyen@gmail.com',
-            phone : '0932159064',
-            address : 'Binh Duong'
+            ma_giay: '2N1X',
+            ten_giay: 'Giấy 3 lớp 2N1X',
+            don_gia: 7400
           }
         ]
       },
@@ -197,19 +146,19 @@
       },
 
       editItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+        this.editedIndex = this.items.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+        this.editedIndex = this.items.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.desserts.splice(this.editedIndex, 1)
+        this.items.splice(this.editedIndex, 1)
         this.closeDelete()
       },
 
@@ -231,9 +180,9 @@
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          Object.assign(this.items[this.editedIndex], this.editedItem)
         } else {
-          this.desserts.push(this.editedItem)
+          this.items.push(this.editedItem)
         }
         this.close()
       },
@@ -242,53 +191,35 @@
 </script>
 
 <style type="text/css">
-.username-size {
+.ma-giay-class {
+  padding: 0 0px !important;
+  width: 30%;
+  color: #3f51b5 !important;
+  text-align: left !important;
+  background-color: LightGray !important;
+}
+
+.don-gia-class {
+  padding: 0 0px !important;
+  width: 30%;
+  color: #3f51b5 !important;
+  text-align: left !important;
+  background-color: LightGray !important;
+}
+
+.ten-giay-class {
+  padding: 0 0px !important;
+  width: 30%;
+  color: #3f51b5 !important;
+  text-align: left !important;
+  background-color: LightGray !important;
+}
+
+.actions-class {
   padding: 0 0px !important;
   width: 10%;
-  color: blue !important;
-  text-align: center !important;
-  background-color: LightGray !important;
-}
-.name-size {
-  padding: 0 0px !important;
-  width: 15%;
-  color: blue !important;
-  text-align: center !important;
-  background-color: LightGray !important;
-}
-.role-size {
-  padding: 0 0px !important;
-  width: 10%;
-  color: blue !important;
-  text-align: center !important;
-  background-color: LightGray !important;
-}
-.email-size {
-  padding: 0 0px !important;
-  width: 15%;
-  color: blue !important;
-  text-align: center !important;
-  background-color: LightGray !important;
-}
-.phone-size {
-  padding: 0 0px !important;
-  width: 10%;
-  color: blue !important;
-  text-align: center !important;
-  background-color: LightGray !important;
-}
-.add-size {
-  padding: 0 0px !important;
-  width: 20%;
-  color: blue !important;
-  text-align: center !important;
-  background-color: LightGray !important;
-}
-.actions-size {
-  padding: 0 0px !important;
-  width: 10%;
-  color: blue !important;
-  text-align: center !important;
+  color: #3f51b5 !important;
+  text-align: left !important;
   background-color: LightGray !important;
 }
 

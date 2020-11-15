@@ -84,6 +84,11 @@ export default {
           to: '/hop'
         },
         {
+          icon: 'mdi-currency-usd',
+          title: 'Tỉ Lệ LN',
+          to: '/tileloinhuan'
+        },
+        {
           icon: 'mdi-account-group',
           title: 'Nhân Viên',
           to: '/nhanvien'
