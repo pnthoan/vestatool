@@ -1,74 +1,203 @@
 <template>
   <div style="width:100%">
+    <v-row justify="center">
+      <v-col cols="10" sm="4">
+          <v-select
+            v-model="loai_hop"
+            :items="list_hop"
+            menu-props="auto"
+            label="Select"
+            hide-details
+            prepend-icon="mdi-dropbox"
+            single-line
+          ></v-select>
+      </v-col>
+    </v-row>
+  <br>
+
+   <v-list>
+      <v-list-item
+        v-for="item in items"
+        :key="item.loai_hop"
+      >
+
+        <v-list-item-content>
+          <v-dialog
+            v-model="dialog"
+            max-width="80%"
+          >
+            <v-card>
+              <v-card-title>
+                <span class="headline" style="color:blue;">{{ formTitle }}</span>
+                <v-spacer></v-spacer>
+                <v-btn class="ma-2" color="primary" dark @click="exportFunc">Export</v-btn>
+                <v-btn class="ma-2" color="primary" dark @click="importFunc">Import</v-btn>
+              </v-card-title>
+
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-col cols="12" sm="2">
+                      <v-select
+                          v-model="so_lop"
+                          :items="solops"
+                          label="Số Lớp"
+                        ></v-select>
+                    </v-col>
+                    <v-col cols="12" sm="10">
+                      <v-container class="grey lighten-2">
+                        <v-row
+                          v-for="k in 4"
+                          :key="k"
+                        >
+                          <v-col
+                            v-for="n in 4"
+                            :key="n"
+                          >
+                            <v-card
+                              class="pa-2"
+                              tile
+                              outlined
+                            >
+                              col
+                            </v-card>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog v-model="dialogDelete" max-width="500px">
+            <v-card>
+              <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <v-container>
+            <v-row style="padding: 3px !important">
+              <p> {{item.loai_hop}}</p>
+              <v-spacer></v-spacer>
+              <v-btn small class="mr-2" outlined fab color="primary">
+                <v-icon  @click="editItem(item)">mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn small class="mr-2" outlined fab color="primary">
+                <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
+              </v-btn>
+            </v-row>
+            <v-container class="grey lighten-2">
+              <v-row
+                v-for="k in 4"
+                :key="k"
+              >
+                <v-col
+                  v-for="n in 4"
+                  :key="n"
+                >
+                  <v-card
+                    class="pa-2"
+                    tile
+                    outlined
+                  >
+                    col
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-container>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+
+    <br>
     <div>
       <div class="center">
-        <v-btn class="mx-2" outlined fab color="indigo" @click="addItem()">
+        <v-btn class="mr-2" outlined fab color="indigo" @click="addItem()">
           <v-icon dark >mdi-plus</v-icon>
         </v-btn>
       </div>
     </div>
-  <br>
-  <v-data-table
-    :headers="headers"
-    :items="items"
-  >
-    <template v-slot:top>
-        <v-dialog
-          v-model="dialog"
-          max-width="80%"
-        >
-          <v-card>
-            <v-card-title>
-              <span class="headline" style="color:blue;">{{ formTitle }}</span>
-            </v-card-title>
+    <v-dialog
+      v-model="dialog_import"
+      persistent
+      max-width="600px"
+    >
+      <v-card>
+        <v-card-title>
+          <span class="headline">Import</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
 
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col cols="12" sm="3">
-                    <v-text-field
-                      v-model="editedItem.loai_hop"
-                      label="Loại Hộp"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="9">
-                    <v-text-field
-                      v-model="editedItem.cong_thuc"
-                      label="Công Thức"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
+            <v-file-input
+              v-model="files"
+              color="deep-purple accent-4"
+              counter
+              label="File input"
+              multiple
+              placeholder="Select your files"
+              prepend-icon="mdi-paperclip"
+              outlined
+              :show-size="1000"
+            >
+              <template v-slot:selection="{ index, text }">
+                <v-chip
+                  v-if="index < 2"
+                  color="deep-purple accent-4"
+                  dark
+                  label
+                  small
+                >
+                  {{ text }}
+                </v-chip>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="save">Save</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <v-dialog v-model="dialogDelete" max-width="500px">
-          <v-card>
-            <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-    </template>
-    <template v-slot:item.actions="{ item }">
-      <v-btn small class="mr-2" outlined fab color="primary" @click="editItem(item)">
-        <v-icon>mdi-pencil</v-icon>
-      </v-btn>
-      <v-btn small class="mr-2" outlined fab color="primary" @click="deleteItem(item)">
-        <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
-      </v-btn>
-    </template>
-  </v-data-table>
+                <span
+                  v-else-if="index === 2"
+                  class="overline grey--text text--darken-3 mx-2"
+                >
+                  +{{ files.length - 2 }} File(s)
+                </span>
+              </template>
+            </v-file-input>
+
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="dialog_import=false"
+          >
+            Close
+          </v-btn>
+          <v-btn
+            :loading="loading"
+            :disabled="loading"
+            color="blue-grey"
+            class="ma-2 white--text"
+            @click="upload"
+          >
+            Submit
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -76,13 +205,19 @@
   export default {
     data: () => ({
       dialog: false,
+      loading: false,
+      dialog_import: false,
       dialogDelete: false,
       headers: [
-        { text: 'Loại Hộp', value: 'loai_hop', class: 'loai-hop-class'},
-        { text: 'Công Thức', value: 'cong_thuc', class: 'cong-thuc-class'},
+        { text: 'Số Lớp', value: 'so_lop', class: 'loai-hop-class'},
         { text: 'Actions', value: 'actions', class: 'actions-size', sortable: false }
       ],
       items: [],
+      files: [],
+      so_lop: 'All',
+      solops:['3', '5', '7', 'All'],
+      loai_hop: 'hop A',
+      list_hop:['hop A', 'hop B'],
       editedIndex: -1,
       editedItem: {
         loai_hop: '',
@@ -96,18 +231,18 @@
 
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'Add' : 'Edit'
+        return this.editedIndex === -1 ? 'Add ' + this.loai_hop : 'Edit ' + this.loai_hop
       },
     },
 
-    watch: {
-      dialog (val) {
-        val || this.close()
-      },
-      dialogDelete (val) {
-        val || this.closeDelete()
-      },
-    },
+    // watch: {
+    //   dialog (val) {
+    //     val || this.close()
+    //   },
+    //   dialogDelete (val) {
+    //     val || this.closeDelete()
+    //   },
+    // },
 
     created () {
       this.initialize()
@@ -150,30 +285,97 @@
         this.closeDelete()
       },
 
-      close () {
-        this.dialog = false
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        })
-      },
+      // close () {
+      //   this.dialog = false
+      //   console.log("closeFunc")
+      //   // this.$nextTick(() => {
+      //   //   this.editedItem = Object.assign({}, this.defaultItem)
+      //   //   this.editedIndex = -1
+      //   // })
+      // },
 
       closeDelete () {
         this.dialogDelete = false
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        })
+        console.log("closeDeleteFunc")
+        // this.$nextTick(() => {
+        //   this.editedItem = Object.assign({}, this.defaultItem)
+        //   this.editedIndex = -1
+        // })
       },
 
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.items[this.editedIndex], this.editedItem)
-        } else {
-          this.items.push(this.editedItem)
-        }
-        this.close()
+        console.log("save function")
+        // if (this.editedIndex > -1) {
+        //   Object.assign(this.items[this.editedIndex], this.editedItem)
+        // } else {
+        //   this.items.push(this.editedItem)
+        // }
+        // this.close()
       },
+      exportFunc(){
+        console.log("exportFunc")
+      },
+      importFunc(){
+        this.dialog_import = true;
+        console.log("importFunc")
+      },
+      async upload () {
+        console.log("Upload")
+        this.loading = true;
+        for (let file of this.files) {
+          console.log(file.name)
+          console.log(process.cwd())
+
+          var reader = new FileReader();
+          var printEventType = function(event) {
+            console.log('got event: ' + event.type);
+          };
+
+          reader.onloadstart = printEventType;
+          reader.onprogress = printEventType;
+          reader.onload = printEventType;
+          reader.onabort = printEventType;
+          reader.onerror = printEventType;
+
+          reader.onloadend = async function (e) {
+            const dataURL = reader.result;
+            let formData = new FormData();
+            formData.data = dataURL;
+            // console.log(JSON.stringify(formData));
+            await axios.post('http://192.168.120.5:3000/upload',
+                    {
+                      data : formData,
+                      headers: {
+                          'Content-Type': 'multipart/form-data'
+                      },
+                      file: file.name
+                    }
+                )
+            .then(function(res) {
+              console.log('SUCCESS!!');
+              console.log(JSON.stringify(res.data));
+            })
+            .catch(function(){
+              console.log('FAILURE!!');
+            });
+          }
+
+          if (file) {
+            reader.readAsDataURL(file);
+          }
+
+        }
+
+        // this.dialog = false;
+        setTimeout(this.close(), 3000)
+      },
+
+      close () {
+        console.log("Close");
+        this.loading = false;
+        this.dialog = false;
+      },
+
     },
   };
 </script>
