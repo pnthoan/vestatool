@@ -25,11 +25,11 @@
             <v-row>
                 <h4 style="color:#1E88E5;">Số Lớp {{item.so_lop}}</h4>
                 <v-spacer></v-spacer>
-                <v-btn small class="mr-2" outlined fab color="primary">
-                  <v-icon  @click="editItem(item)">mdi-pencil</v-icon>
+                <v-btn small class="mr-2" outlined fab color="primary" @click="editItem(item)">
+                  <v-icon>mdi-pencil</v-icon>
                 </v-btn>
-                <v-btn small class="mr-2" outlined fab color="primary">
-                  <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
+                <v-btn small class="mr-2" outlined fab color="primary" @click="deleteItem(item)">
+                  <v-icon>mdi-delete</v-icon>
                 </v-btn>
             </v-row>
             <v-row
@@ -70,16 +70,18 @@
     >
       <v-card>
         <v-card-title>
-          <span class="headline" style="color:blue;">{{ formTitle }}</span>
+          <span class="headline" style="color:#1E88E5;">{{ formTitle }}</span>
           <v-spacer></v-spacer>
-          <v-btn class="ma-2" color="primary" dark @click="exportFunc">Export</v-btn>
-          <v-btn class="ma-2" color="primary" dark @click="importFunc">Import</v-btn>
+          <span>
+            <v-btn class="ma-2" outlined color="indigo" dark @click="exportFunc">Export</v-btn>
+            <v-btn class="ma-2" outlined color="indigo" dark @click="importFunc">Import</v-btn>
+          </span>
         </v-card-title>
 
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" sm="2">
+              <v-col v-if="editedIndex===-1" cols="12" sm="2">
                 <v-select
                     v-model="so_lop"
                     :items="solops"
@@ -134,11 +136,10 @@
     <v-dialog v-model="dialog_import" persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="headline">Import</span>
+          <span class="headline" style="color:#1E88E5;">Import</span>
         </v-card-title>
         <v-card-text>
           <v-container>
-
             <v-file-input
               v-model="files"
               color="deep-purple accent-4"
@@ -184,8 +185,8 @@
           <v-btn
             :loading="loading"
             :disabled="loading"
-            color="blue-grey"
-            class="ma-2 white--text"
+            color="blue darken-1"
+            text
             @click="upload"
           >
             Submit
