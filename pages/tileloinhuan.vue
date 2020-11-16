@@ -13,112 +13,42 @@
           ></v-select>
       </v-col>
     </v-row>
-  <br>
+    <br>
 
-   <v-list>
+    <v-list>
       <v-list-item
         v-for="item in items"
         :key="item.loai_hop"
       >
-
         <v-list-item-content>
-          <v-dialog
-            v-model="dialog"
-            max-width="80%"
-          >
-            <v-card>
-              <v-card-title>
-                <span class="headline" style="color:blue;">{{ formTitle }}</span>
+          <v-container class="grey lighten-3">
+            <v-row>
+                <h4 style="color:#1E88E5;">Số Lớp {{item.so_lop}}</h4>
                 <v-spacer></v-spacer>
-                <v-btn class="ma-2" color="primary" dark @click="exportFunc">Export</v-btn>
-                <v-btn class="ma-2" color="primary" dark @click="importFunc">Import</v-btn>
-              </v-card-title>
-
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="2">
-                      <v-select
-                          v-model="so_lop"
-                          :items="solops"
-                          label="Số Lớp"
-                        ></v-select>
-                    </v-col>
-                    <v-col cols="12" sm="10">
-                      <v-container class="grey lighten-2">
-                        <v-row
-                          v-for="k in 4"
-                          :key="k"
-                        >
-                          <v-col
-                            v-for="n in 4"
-                            :key="n"
-                          >
-                            <v-card
-                              class="pa-2"
-                              tile
-                              outlined
-                            >
-                              col
-                            </v-card>
-                          </v-col>
-                        </v-row>
-                      </v-container>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-
-          <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card>
-              <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-
-          <v-container>
-            <v-row style="padding: 3px !important">
-              <p> {{item.loai_hop}}</p>
-              <v-spacer></v-spacer>
-              <v-btn small class="mr-2" outlined fab color="primary">
-                <v-icon  @click="editItem(item)">mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn small class="mr-2" outlined fab color="primary">
-                <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
-              </v-btn>
+                <v-btn small class="mr-2" outlined fab color="primary">
+                  <v-icon  @click="editItem(item)">mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn small class="mr-2" outlined fab color="primary">
+                  <v-icon @click="deleteItem(item)">mdi-delete</v-icon>
+                </v-btn>
             </v-row>
-            <v-container class="grey lighten-2">
-              <v-row
-                v-for="k in 4"
-                :key="k"
+            <v-row
+              v-for="k in 4"
+              :key="k"
+            >
+              <v-col
+                v-for="n in 4"
+                :key="n"
               >
-                <v-col
-                  v-for="n in 4"
-                  :key="n"
+                <v-card
+                  class="pa-2"
+                  tile
+                  outlined
                 >
-                  <v-card
-                    class="pa-2"
-                    tile
-                    outlined
-                  >
-                    col
-                  </v-card>
-                </v-col>
-              </v-row>
-            </v-container>
+                  col
+                </v-card>
+              </v-col>
+            </v-row>
           </v-container>
         </v-list-item-content>
       </v-list-item>
@@ -132,11 +62,76 @@
         </v-btn>
       </div>
     </div>
+
+
     <v-dialog
-      v-model="dialog_import"
-      persistent
-      max-width="600px"
+      v-model="dialog"
+      max-width="80%"
     >
+      <v-card>
+        <v-card-title>
+          <span class="headline" style="color:blue;">{{ formTitle }}</span>
+          <v-spacer></v-spacer>
+          <v-btn class="ma-2" color="primary" dark @click="exportFunc">Export</v-btn>
+          <v-btn class="ma-2" color="primary" dark @click="importFunc">Import</v-btn>
+        </v-card-title>
+
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12" sm="2">
+                <v-select
+                    v-model="so_lop"
+                    :items="solops"
+                    label="Số Lớp"
+                  ></v-select>
+              </v-col>
+              <v-col cols="12" sm="10">
+                <v-container class="grey lighten-2">
+                  <v-row
+                    v-for="k in 4"
+                    :key="k"
+                  >
+                    <v-col
+                      v-for="n in 4"
+                      :key="n"
+                    >
+                      <v-card
+                        class="pa-2"
+                        tile
+                        outlined
+                      >
+                        col
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+          <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialogDelete" max-width="500px">
+      <v-card>
+        <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+          <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialog_import" persistent max-width="600px">
       <v-card>
         <v-card-title>
           <span class="headline">Import</span>
@@ -252,12 +247,12 @@
       initialize () {
         this.items = [
           {
-            loai_hop: 'Hộp size lớn',
-            cong_thuc: '((c + r) + 5) * ((d + r) * 2 + 5)* g * 1.1/10000'
+            so_lop: '3',
+            ti_le_ln: '((c + r) + 5) * ((d + r) * 2 + 5)* g * 1.1/10000'
           },
           {
-            loai_hop: 'Hộp thường',
-            cong_thuc: '((c + r)+5)*((d + r)*2+5)* g*1.15/10000'
+            so_lop: '3',
+            ti_le_ln: '((c + r)+5)*((d + r)*2+5)* g*1.15/10000'
           }
         ]
       },
@@ -269,14 +264,15 @@
       },
 
       editItem (item) {
+        console.log(JSON.stringify(item))
         this.editedIndex = this.items.indexOf(item)
-        this.editedItem = Object.assign({}, item)
+        // this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
         this.editedIndex = this.items.indexOf(item)
-        this.editedItem = Object.assign({}, item)
+        // this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
 
@@ -384,14 +380,14 @@
 .loai-hop-class {
   padding: 0 0px !important;
   width: 25%;
-  color: #3f51b5 !important;
+  color: #1E88E5 !important;
   text-align: left !important;
   background-color: LightGray !important;
 }
 .cong-thuc-class {
   padding: 0 0px !important;
   width: 60%;
-  color: #3f51b5 !important;
+  color: #1E88E5 !important;
   text-align: left !important;
   background-color: LightGray !important;
 }
@@ -399,7 +395,7 @@
 .actions-size {
   padding: 0 0px !important;
   width: 15%;
-  color: #3f51b5 !important;
+  color: #1E88E5 !important;
   text-align: left !important;
   background-color: LightGray !important;
 }
@@ -413,5 +409,8 @@
   align-items: center;
   justify-content: center;
   display: flex;
+}
+.v-icon.v-icon {
+  color: #1E88E5;
 }
 </style>
