@@ -76,11 +76,11 @@
           return;
         }
         console.log("On Submit function!");
-        console.log(this.username + ":" + this.password);
+        // console.log(this.username + ":" + this.password);
         const userdata = {username: this.username, password: this.password};
         await this.$axios.post('/api/login', userdata)
         .then(res => {
-          console.log(JSON.stringify(res.data))
+          // console.log(JSON.stringify(res.data))
           this.$cookies.set('token', res.data.token, {sameSite:'None'});
           this.$cookies.set('username', res.data.username, {sameSite:'None'});
           this.$cookies.set('name', res.data.name, {sameSite:'None'});

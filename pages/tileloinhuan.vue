@@ -231,35 +231,18 @@
       },
     },
 
-    // watch: {
-    //   dialog (val) {
-    //     val || this.close()
-    //   },
-    //   dialogDelete (val) {
-    //     val || this.closeDelete()
-    //   },
-    // },
-
-    created () {
-      this.initialize()
+    async asyncData({ $axios }) {
+      const giays = await $axios.$get('/api/hop')
+      let item = []
+      var ele
+      for (ele of giays) {
+        item.push(ele)
+      }
+      return {items: item};
     },
 
     methods: {
-      initialize () {
-        this.items = [
-          {
-            so_lop: '3',
-            ti_le_ln: '((c + r) + 5) * ((d + r) * 2 + 5)* g * 1.1/10000'
-          },
-          {
-            so_lop: '3',
-            ti_le_ln: '((c + r)+5)*((d + r)*2+5)* g*1.15/10000'
-          }
-        ]
-      },
-
       addItem() {
-        console.log("Add new item");
         this.editedIndex = -1;
         this.dialog = true;
       },
