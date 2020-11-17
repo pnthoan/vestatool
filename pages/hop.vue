@@ -109,26 +109,18 @@
       },
     },
 
-    created () {
-      this.initialize()
+    async asyncData({ $axios }) {
+      const giays = await $axios.$get('/api/hop')
+      let item = []
+      var ele
+      for (ele of giays) {
+        item.push(ele)
+      }
+      return {items: item};
     },
 
     methods: {
-      initialize () {
-        this.items = [
-          {
-            loai_hop: 'Hộp size lớn',
-            cong_thuc: '((c + r) + 5) * ((d + r) * 2 + 5)* g * 1.1/10000'
-          },
-          {
-            loai_hop: 'Hộp thường',
-            cong_thuc: '((c + r)+5)*((d + r)*2+5)* g*1.15/10000'
-          }
-        ]
-      },
-
       addItem() {
-        console.log("Add new item");
         this.editedIndex = -1;
         this.dialog = true;
       },
@@ -145,9 +137,12 @@
         this.dialogDelete = true
       },
 
-      deleteItemConfirm () {
-        this.items.splice(this.editedIndex, 1)
-        this.closeDelete()
+      async deleteItemConfirm () {
+        await this.$axios.delete('/api/hop/' + this.editedItem._id)
+        .then(res => {
+          this.items.splice(this.editedIndex, 1)
+          this.closeDelete()
+        })
       },
 
       close () {
@@ -166,11 +161,25 @@
         })
       },
 
-      save () {
+      async save ({ $axios }) {
         if (this.editedIndex > -1) {
-          Object.assign(this.items[this.editedIndex], this.editedItem)
+          let item = this.items[this.editedIndex]
+          await this.$axios.put('/api/hop/' + item._id, {
+            "loai_hop": this.editedItem.loai_hop,
+            "cong_thuc": this.editedItem.cong_thuc
+          })
+          .then(res => {
+            // console.log(res.data)
+            Object.assign(this.items[this.editedIndex], res.data)
+          })
         } else {
-          this.items.push(this.editedItem)
+          await this.$axios.post('/api/hop', {
+            "loai_hop": this.editedItem.loai_hop,
+            "cong_thuc": this.editedItem.cong_thuc
+          })
+          .then(res => {
+            this.items.push(res.data)
+          })
         }
         this.close()
       },
