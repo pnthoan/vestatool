@@ -7,7 +7,7 @@
        <v-toolbar-title style="color:#3f51b5;" v-text="title" />
       <vuetify-logo />
       <v-spacer></v-spacer>
-      <v-btn icon><v-icon>mdi-login-variant</v-icon></v-btn>
+      <v-btn icon @click="onLogin()"><v-icon>mdi-login-variant</v-icon></v-btn>
     </v-app-bar>
 
     <v-main>
@@ -37,6 +37,11 @@ export default {
   },
   components: {
     VuetifyLogo
+  },
+  methods: {
+    onLogin() {
+      this.$router.push('/login')
+    }
   }
 };
 </script>

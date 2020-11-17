@@ -88,14 +88,14 @@
                     label="Số Lớp"
                   ></v-select>
               </v-col>
-              <v-col cols="12" sm="10">
+              <v-col cols="12" sm="12">
                 <v-container class="grey lighten-2">
                   <v-row
                     v-for="k in 4"
                     :key="k"
                   >
                     <v-col
-                      v-for="n in 4"
+                      v-for="n in 8"
                       :key="n"
                     >
                       <v-card

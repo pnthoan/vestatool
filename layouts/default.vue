@@ -40,7 +40,7 @@
       <v-toolbar-title style="color:#3f51b5;" v-text="title" />
       <vuetify-logo />
       <v-spacer></v-spacer>
-      <v-btn icon><v-icon>mdi-logout-variant</v-icon></v-btn>
+      <v-btn icon @click="onLogout()"><v-icon>mdi-logout-variant</v-icon></v-btn>
     </v-app-bar>
 
     <v-main>
@@ -67,7 +67,16 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
-      items: [
+      items: [],
+      miniVariant: false,
+      title: 'Ebox'
+    }
+  },
+  created() {
+    console.log("create default!")
+    const role = this.$cookies.get('role');
+    if (role === 'Admin') {
+      this.items = [
         {
           icon: 'mdi-apps',
           title: 'Tính Giá',
@@ -93,14 +102,25 @@ export default {
           title: 'Nhân Viên',
           to: '/nhanvien'
         }
-      ],
-      miniVariant: false,
-      title: 'Ebox'
+        ]
+    } else {
+      this.items = [{
+          icon: 'mdi-apps',
+          title: 'Tính Giá',
+          to: '/tinhgia'
+        }]
     }
   },
   components: {
     VuetifyLogo
-  }
+  },
+  methods: {
+    onLogout() {
+      console.log("onLogout func")
+      this.$cookies.removeAll()
+      this.$router.push('/')
+    }
+  },
 };
 </script>
 <style type="text/css">
