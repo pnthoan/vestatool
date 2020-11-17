@@ -10,7 +10,7 @@
   <br>
   <v-data-table
     :headers="headers"
-    :items="desserts"
+    :items="items"
   >
     <template v-slot:top>
         <v-dialog
@@ -118,13 +118,13 @@
         { text: 'Actions', value: 'actions', class: 'actions-size', sortable: false }
       ],
       roles: ['Admin', 'Member'],
-      desserts: [],
+      items: [],
       editedIndex: -1,
       editedItem: {
         username: '',
         password: '',
         name: '',
-        role: '',
+        role: 'Member',
         email: '',
         phone: '',
         address: ''
@@ -133,7 +133,7 @@
         username: '',
         password: '',
         name: '',
-        role: '',
+        role: 'Member',
         email: '',
         phone: '',
         address: ''
@@ -155,32 +155,17 @@
       },
     },
 
-    created () {
-      this.initialize()
+    async asyncData({ $axios }) {
+      const users = await $axios.$get('/api/user')
+      let item = []
+      var ele
+      for (ele of users) {
+        item.push(ele)
+      }
+      return {items: item};
     },
 
     methods: {
-      initialize () {
-        this.desserts = [
-          {
-            username : 'pnthoan',
-            name : 'Pham Ngoc Thoan',
-            role : 'Admin',
-            email : 'pnthoan@gmail.com',
-            phone : '0932159064',
-            address : 'Binh Phuoc'
-          },
-          {
-            username : 'ntlhuyen',
-            name : 'Nguyen Thi Le Huyen',
-            role : 'Member',
-            email : 'ntlhuyen@gmail.com',
-            phone : '0932159064',
-            address : 'Binh Duong'
-          }
-        ]
-      },
-
       addItem() {
         console.log("Add new item");
         this.editedIndex = -1;
@@ -188,20 +173,23 @@
       },
 
       editItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+        this.editedIndex = this.items.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+        this.editedIndex = this.items.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
 
-      deleteItemConfirm () {
-        this.desserts.splice(this.editedIndex, 1)
-        this.closeDelete()
+      async deleteItemConfirm () {
+        await this.$axios.delete('/api/user/' + this.editedItem._id)
+        .then(res => {
+          this.items.splice(this.editedIndex, 1)
+          this.closeDelete()
+        })
       },
 
       close () {
@@ -220,11 +208,35 @@
         })
       },
 
-      save () {
+      async save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          let item = this.items[this.editedIndex]
+          await this.$axios.put('/api/user/' + item._id, {
+            "username": this.editedItem.username,
+            "name": this.editedItem.name,
+            "role": this.editedItem.role,
+            "email": this.editedItem.email,
+            "phone": this.editedItem.phone,
+            "address": this.editedItem.address
+          })
+          .then(res => {
+            // console.log(res.data)
+            Object.assign(this.items[this.editedIndex], res.data)
+          })
         } else {
-          this.desserts.push(this.editedItem)
+          await this.$axios.post('/api/user', {
+            "username": this.editedItem.username,
+            "password": this.editedItem.password,
+            "name": this.editedItem.name,
+            "role": this.editedItem.role,
+            "email": this.editedItem.email,
+            "phone": this.editedItem.phone,
+            "address": this.editedItem.address
+          })
+          .then(res => {
+            // console.log(res.data)
+            this.items.push(res.data)
+          })
         }
         this.close()
       },

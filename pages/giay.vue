@@ -130,10 +130,6 @@
       },
     },
 
-    // created () {
-    //   this.initialize()
-    // },
-
     async asyncData({ $axios }) {
       const giays = await $axios.$get('/api/giay')
       let item = []
@@ -145,25 +141,7 @@
     },
 
     methods: {
-      // async initialize () {
-      // this.items = [
-      //     {
-      //       ma_giay: '2N3X',
-      //       ten_giay: 'Giấy 5 lớp 2N3X',
-      //       don_gia: 9700,
-      //       so_lop: 3
-      //     },
-      //     {
-      //       ma_giay: '2N1X',
-      //       ten_giay: 'Giấy 3 lớp 2N1X',
-      //       don_gia: 7400,
-      //       so_lop: 3
-      //     }
-      //   ]
-      // },
-
       addItem() {
-        console.log("Add new item");
         this.editedIndex = -1;
         this.dialog = true;
       },
@@ -181,7 +159,6 @@
       },
 
       async deleteItemConfirm () {
-        // console.log(this.editedItem)
         await this.$axios.delete('/api/giay/' + this.editedItem._id)
         .then(res => {
           this.items.splice(this.editedIndex, 1)
@@ -208,7 +185,6 @@
       async save ({ $axios }) {
         if (this.editedIndex > -1) {
           let item = this.items[this.editedIndex]
-          // console.log(item)
           await this.$axios.put('/api/giay/' + item._id, {
             "ma_giay": this.editedItem.ma_giay,
             "ten_giay": this.editedItem.ten_giay,
