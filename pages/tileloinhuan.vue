@@ -20,7 +20,7 @@
         v-for="item in items"
         :key="item.loai_hop"
       >
-        <v-list-item-content>
+        <v-list-item-content v-model="item.loi_nhuan">
           <v-container class="grey lighten-3" v-if="item.loi_nhuan.length>0">
             <v-row>
                 <h4 style="color:#1E88E5;">Số Lớp {{item.so_lop}}</h4>
@@ -32,20 +32,19 @@
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
             </v-row>
+
             <v-row
               v-for="k in item.loi_nhuan"
-              :key="k"
             >
               <v-col
                 v-for="n in k"
-                :key="n"
               >
                 <v-card
                   class="pa-2"
                   tile
                   outlined
                 >
-                  col
+                  {{n}}
                 </v-card>
               </v-col>
             </v-row>
@@ -85,25 +84,23 @@
           </span>
         </v-card-title>
 
-        <v-card-text>
+        <v-card-text v-model="editedItem.loi_nhuan">
           <v-container v-if="editedItem.loi_nhuan.length>0">
             <v-row>
               <v-col cols="12" sm="12">
                 <v-container class="grey lighten-2">
                   <v-row
                     v-for="k in editedItem.loi_nhuan"
-                    :key="k"
                   >
                     <v-col
                       v-for="n in k"
-                      :key="n"
                     >
                       <v-card
                         class="pa-2"
                         tile
                         outlined
                       >
-                        col
+                        {{n}}
                       </v-card>
                     </v-col>
                   </v-row>
@@ -115,8 +112,8 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-          <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+          <v-btn color="blue darken-1" text @click="cancelFunc">Cancel</v-btn>
+          <v-btn color="blue darken-1" text @click="saveFunc">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -178,7 +175,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="dialog_import=false"
+            @click="closeImportFunc"
           >
             Close
           </v-btn>
@@ -304,6 +301,7 @@
 
       importFunc(){
         this.dialog_import = true;
+        this.dialog = false;
         console.log("importFunc")
         console.log(this.so_lop + " : " + this.loai_hop);
       },
@@ -335,7 +333,7 @@
             await sleep(1);
           }
 
-          await this.$axios.post('/api/upload',
+          const res_data = await this.$axios.post('/api/upload',
               {
                 data : formData,
                 headers: {
@@ -346,13 +344,24 @@
           )
           .then(function(res) {
             console.log('SUCCESS!!');
-            console.log(JSON.stringify(res.data));
-            this.editedItem.loi_nhuan = res.data
+            return res.data;
           })
           .catch(function(){
             console.log('FAILURE!!');
           });
-          setTimeout(this.close(), 3000)
+
+          this.editedItem.loi_nhuan = []
+          let el;
+          for (el of res_data) {
+            this.editedItem.loi_nhuan.push(el)
+          }
+
+          console.log(JSON.stringify(this.editedItem.loi_nhuan));
+
+          // setTimeout(this.close(), 3000)
+          this.loading = false;
+          this.dialog_import = false;
+          this.dialog = true;
         }
       },
 
@@ -360,9 +369,36 @@
         console.log("Close");
         this.dialog_import = false;
         // this.loading = false;
-        // this.dialog = false;
+        this.dialog = false;
       },
 
+      cancelFunc() {
+        console.log("cancelFunc");
+        this.loading = false;
+        this.dialog_import = false;
+        this.dialog = false;
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      },
+
+      saveFunc() {
+        console.log("saveFunc");
+        console.log(JSON.stringify(this.editedItem.loi_nhuan));
+        console.log(this.so_lop);
+        console.log(this.loai_hop);
+        console.log(JSON.stringify(this.items));
+        this.items[0].loi_nhuan = this.editedItem.loi_nhuan;
+        this.dialog = false;
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      },
+
+      closeImportFunc() {
+        console.log("closeImportFunc");
+        this.dialog_import = false;
+        this.files = [];
+        this.dialog = true;
+      }
     },
   };
 </script>
