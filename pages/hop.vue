@@ -109,11 +109,13 @@
       },
     },
 
-    async asyncData({ $axios }) {
-      const giays = await $axios.$get('/api/hop')
+    async asyncData({ $axios, $cookies }) {
+      // const token = $cookies.get('token')
+      // console.log(token)
+      const hops = await $axios.$get('/api/hop')
       let item = []
       var ele
-      for (ele of giays) {
+      for (ele of hops) {
         item.push(ele)
       }
       return {items: item};
