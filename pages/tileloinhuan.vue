@@ -34,7 +34,7 @@
             </v-row>
 
             <v-row
-              v-for="k in item.loi_nhuan"
+              v-for="k in item.loi_nhuan.he_so"
             >
               <v-col
                 v-for="n in k"
@@ -84,13 +84,13 @@
           </span>
         </v-card-title>
 
-        <v-card-text v-model="editedItem.loi_nhuan">
-          <v-container v-if="editedItem.loi_nhuan.length>0">
+        <v-card-text v-model="editedItem.he_so">
+          <v-container v-if="editedItem.he_so.length>0">
             <v-row>
               <v-col cols="12" sm="12">
                 <v-container class="grey lighten-2">
                   <v-row
-                    v-for="k in editedItem.loi_nhuan"
+                    v-for="k in editedItem.he_so"
                   >
                     <v-col
                       v-for="n in k"
@@ -213,14 +213,12 @@
       ten_hops:[],
       editedIndex: -1,
       editedItem: {
-        loai_hop: '',
-        cong_thuc: '',
-        loi_nhuan: []
+        so_lop: 0,
+        he_so: []
       },
       defaultItem: {
-        loai_hop: '',
-        cong_thuc: '',
-        loi_nhuan: []
+        so_lop: 0,
+        he_so: []
       },
     }),
 
@@ -350,13 +348,13 @@
             console.log('FAILURE!!');
           });
 
-          this.editedItem.loi_nhuan = []
+          this.editedItem.he_so = []
           let el;
           for (el of res_data) {
-            this.editedItem.loi_nhuan.push(el)
+            this.editedItem.he_so.push(el)
           }
 
-          console.log(JSON.stringify(this.editedItem.loi_nhuan));
+          console.log(JSON.stringify(this.editedItem.he_so));
 
           // setTimeout(this.close(), 3000)
           this.loading = false;
@@ -381,13 +379,59 @@
         this.editedIndex = -1;
       },
 
-      saveFunc() {
+      getMatchItem(hop) {
+        let i
+        for (i in this.items) {
+          if (hop === this.items[i].loai_hop) {
+            return i;
+          }
+        }
+        return -1;
+      },
+
+      async saveFunc() {
         console.log("saveFunc");
-        console.log(JSON.stringify(this.editedItem.loi_nhuan));
+        console.log(JSON.stringify(this.editedItem.he_so));
         console.log(this.so_lop);
         console.log(this.loai_hop);
-        console.log(JSON.stringify(this.items));
-        this.items[0].loi_nhuan = this.editedItem.loi_nhuan;
+        const index = this.getMatchItem(this.loai_hop);
+
+        if (index < 0)
+        {
+          console.log("Not found item!");
+        }
+        else
+        {
+          console.log("Found!");
+          const content = {
+            he_so: this.editedItem.he_so,
+            so_lop: (this.so_lop === "All") ? 0 : parseInt(this.so_lop)
+          };
+
+          var ln = this.items[index].loi_nhuan
+          let sl
+          for (sl of ln){
+            if (sl.so_lop === this.so_lop) {
+              console.log('Da co thong tin so_lop = ' + this.so_lop);
+              return;
+            }
+          }
+          ln.push(content)
+          const data = {loi_nhuan: ln}
+
+          await this.$axios.put('/api/hop/' + this.items[index]._id, data)
+          .then(function(res)
+          {
+            console.log('SUCCESS!!');
+            // console.log(res.data)
+          })
+          .catch(function()
+          {
+            console.log('FAILURE!!');
+          });
+        }
+
+        // this.items[0].loi_nhuan = this.editedItem.he_so;
         this.dialog = false;
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
