@@ -15,13 +15,13 @@
     </v-row>
     <br>
 
-    <v-list>
+    <v-list v-if="loai_hop">
       <v-list-item
-        v-for="item in items"
-        :key="item.loai_hop"
+        v-for="(item, index) in findElement()"
+        :key="index"
       >
-        <v-list-item-content v-model="item.loi_nhuan">
-          <v-container class="grey lighten-3" v-if="item.loi_nhuan.length>0">
+        <v-list-item-content v-model="item.he_so">
+          <v-container class="grey lighten-3" v-if="item.he_so.length>0">
             <v-row>
                 <h4 style="color:#1E88E5;">Số Lớp {{item.so_lop}}</h4>
                 <v-spacer></v-spacer>
@@ -34,10 +34,12 @@
             </v-row>
 
             <v-row
-              v-for="k in item.loi_nhuan.he_so"
+              v-for="(item, idx) in JSON.parse(item.he_so)"
+              :key="idx"
             >
               <v-col
-                v-for="n in k"
+                v-for="(n, i) in item"
+                :key="i"
               >
                 <v-card
                   class="pa-2"
@@ -90,10 +92,12 @@
               <v-col cols="12" sm="12">
                 <v-container class="grey lighten-2">
                   <v-row
-                    v-for="k in editedItem.he_so"
+                    v-for="(k, idx) in editedItem.he_so"
+                    :key="idx"
                   >
                     <v-col
-                      v-for="n in k"
+                      v-for="(n,i) in k"
+                      :key="i"
                     >
                       <v-card
                         class="pa-2"
@@ -191,12 +195,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="alert" max-width="50%">
+      <v-alert type="error">
+        Something wrong!
+      </v-alert>
+    </v-dialog>
   </div>
 </template>
 
 <script>
   export default {
     data: () => ({
+      alert: false,
       dialog: false,
       loading: false,
       dialog_import: false,
@@ -225,7 +236,7 @@
     computed: {
       formTitle () {
         return this.editedIndex === -1 ? 'Add ' + this.loai_hop : 'Edit ' + this.loai_hop
-      },
+      }
     },
 
     async asyncData({ $axios }) {
@@ -241,6 +252,18 @@
     },
 
     methods: {
+      findElement() {
+        console.log("findElement")
+        var ele
+        for (ele of this.items) {
+          if (ele.loai_hop === this.loai_hop) {
+            console.log(ele)
+            return ele.loi_nhuan
+          }
+        }
+        return {he_so : []}
+      },
+
       addItem() {
         if (this.loai_hop === '') return;
         this.editedIndex = -1;
@@ -249,19 +272,67 @@
 
       editItem (item) {
         console.log(JSON.stringify(item))
-        this.editedIndex = this.items.indexOf(item)
+        this.so_lop = item.so_lop
+        this.editedItem.he_so = []
+        this.editedItem.so_lop = item.so_lop
+        let el;
+        for (el of JSON.parse(item.he_so)) {
+          this.editedItem.he_so.push(el)
+        }
+
+        console.log(JSON.stringify(this.editedItem.he_so));
+        // this.editedIndex = this.items.indexOf(item)
+        this.editedIndex = 2
+        // console.log(this.editedIndex)
         // this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.items.indexOf(item)
+        console.log(JSON.stringify(item))
+        console.log(this.loai_hop)
+        // this.editedIndex = this.items.indexOf(item)
         // this.editedItem = Object.assign({}, item)
+        this.so_lop = item.so_lop
         this.dialogDelete = true
       },
 
-      deleteItemConfirm () {
-        this.items.splice(this.editedIndex, 1)
+      async deleteItemConfirm () {
+        // this.items.splice(this.editedIndex, 1)
+        const index = this.getMatchItem(this.loai_hop);
+        if (index < 0)
+        {
+          console.log("Not found item!");
+        }
+        else
+        {
+          console.log("Found!");
+          var ln = this.items[index].loi_nhuan
+          let sl_idx
+          var so_lop_cv = 0
+          if (this.so_lop !== "All") {
+            so_lop_cv = parseInt(this.so_lop)
+          }
+          console.log("pnthoan: " + so_lop_cv + ":" + this.so_lop)
+          for (sl_idx in ln){
+            if (parseInt(ln[sl_idx].so_lop) === so_lop_cv) {
+              console.log('Found thong tin so_lop = ' + ln[sl_idx].so_lop);
+              ln.splice(sl_idx, 1)
+            }
+          }
+          const data = {loi_nhuan: ln}
+
+          await this.$axios.put('/api/hop/' + this.items[index]._id, data)
+          .then(function(res)
+          {
+            console.log('SUCCESS!!');
+            // console.log(res.data)
+          })
+          .catch(function()
+          {
+            console.log('FAILURE!!');
+          });
+        }
         this.closeDelete()
       },
 
@@ -292,9 +363,34 @@
         // }
         // this.close()
       },
-      exportFunc(){
+
+      async exportFunc() {
         console.log("exportFunc")
-        console.log(this.so_lop + " : " + this.loai_hop);
+        console.log(JSON.stringify(this.editedItem));
+        const res_data = await this.$axios.post('/api/export', this.editedItem)
+        .then(function(res) {
+          console.log('SUCCESS!!');
+          return res.data
+        })
+        .catch(function(){
+          console.log('FAILURE!!');
+        });
+
+        console.log(res_data)
+        await this.$axios({
+            url: 'uploads/' + res_data,
+            method: 'GET',
+            responseType: 'blob',
+        }).then((response) => {
+             var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+             var fileLink = document.createElement('a');
+
+             fileLink.href = fileURL;
+             fileLink.setAttribute('download', res_data);
+             document.body.appendChild(fileLink);
+
+             fileLink.click();
+        });
       },
 
       importFunc(){
@@ -392,8 +488,7 @@
       async saveFunc() {
         console.log("saveFunc");
         console.log(JSON.stringify(this.editedItem.he_so));
-        console.log(this.so_lop);
-        console.log(this.loai_hop);
+
         const index = this.getMatchItem(this.loai_hop);
 
         if (index < 0)
@@ -403,20 +498,41 @@
         else
         {
           console.log("Found!");
-          const content = {
-            he_so: this.editedItem.he_so,
-            so_lop: (this.so_lop === "All") ? 0 : parseInt(this.so_lop)
+          let ln = this.items[index].loi_nhuan
+          let sl
+          let so_lop_cv = 0
+          let found = false
+
+          if (this.so_lop !== "All") {
+            so_lop_cv = parseInt(this.so_lop)
+          } 
+          for (sl of ln){
+            if (parseInt(sl.so_lop) === so_lop_cv) {
+              if (this.editedIndex === -1) { //add
+                console.log('Da co thong tin so_lop = ' + this.so_lop);
+                this.alert = true;
+                setTimeout(()=>{
+                      this.alert=false
+                },1500)
+                return;
+              } else { //edit
+                found = true;
+                sl.he_so = JSON.stringify(this.editedItem.he_so)
+                break;
+              }
+            }
+
+          }
+
+         const content = {
+            he_so: JSON.stringify(this.editedItem.he_so),
+            so_lop: so_lop_cv
           };
 
-          var ln = this.items[index].loi_nhuan
-          let sl
-          for (sl of ln){
-            if (sl.so_lop === this.so_lop) {
-              console.log('Da co thong tin so_lop = ' + this.so_lop);
-              return;
-            }
+          if (!found) { // add new
+            ln.push(content)
           }
-          ln.push(content)
+
           const data = {loi_nhuan: ln}
 
           await this.$axios.put('/api/hop/' + this.items[index]._id, data)
@@ -435,6 +551,7 @@
         this.dialog = false;
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
+        this.files = [];
       },
 
       closeImportFunc() {
