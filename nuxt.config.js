@@ -16,7 +16,7 @@ export default {
   },
   server: {
     host: '0.0.0.0',
-    port: 3001 // default: 3000
+    port: 3000 // default: 3000
   },
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
@@ -46,7 +46,7 @@ export default {
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://ebox-dev.triti.top',
   },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
