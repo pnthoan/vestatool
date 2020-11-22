@@ -117,19 +117,25 @@
   <div class="center">
       <v-btn class="mx-2" outlined fab color="indigo" @click="onSubmit">OK</v-btn>
       <v-btn class="mx-2" outlined fab color="indigo" @click="onClose">Clear</v-btn>
-    </div>
+  </div>
+  <v-dialog v-model="alert" max-width="50%">
+      <v-alert type="error">
+        Input Invalid!
+      </v-alert>
+    </v-dialog>
   </v-container>
 </template>
 
 <script>
   export default {
     data: () => ({
+      alert: false,
       username: '',
       gia: 0,
       valid: false,
 
-      loaihop: 'Hộp thường',
-      loaigiay: 'Giấy 2N1X',
+      loaihop: '',
+      loaigiay: '',
       chieudai: 0,
       chieurong: 0,
       chieucao: 0,
@@ -140,30 +146,37 @@
       isprint: false,
       giakhuon: 500000,
 
-      listloaihop: ['Hộp thường',
-                    'Hộp thường Size Lớn',
-                    'Hộp giày',
-                    'Hộp gài',
-                    'Nắp cài 2 đáy',
-                    'Nắp cài đáy gài',
-                    'Âm dương gài'
-                    ],
-      listloaigiay: ['Giấy 2N1X',
-                     'Giấy 1N2X',
-                     'Giấy 2T1X',
-                     'Giấy TXN',
-                     'Giấy 2N3X'],
+      listloaihop: [],
+      listloaigiay: [],
 
       listmauin: ['0', '1', '2', '3', '4', '5', '6', '7', '8'],
     }),
     chieudaiRules: [
       v => !!v
     ],
+
+    async asyncData({ $axios }) {
+      const hops = await $axios.$get('/api/hop')
+      const giays = await $axios.$get('/api/giay')
+      let loaihop = []
+      let loaigiay = []
+      let ele
+      for (ele of hops) {
+        loaihop.push(ele.loai_hop)
+      }
+
+      for (ele of giays) {
+        loaigiay.push(ele.ma_giay)
+      }
+      console.log(giays)
+      return {listloaihop: loaihop, listloaigiay: loaigiay};
+    },
+
     methods: {
       onClose() {
         console.log("onClose function!");
-        this.loaihop = 'Hộp thường';
-        this.loaigiay = 'Giấy 2N1X';
+        this.loaihop = '';
+        this.loaigiay = '';
         this.chieudai = 0;
         this.chieurong = 0;
         this.chieucao = 0;
@@ -174,9 +187,46 @@
         this.giakhuon = 500000;
       }, 
 
-      onSubmit()
+      async onSubmit()
       {
         console.log("On Submit function!");
+        if (!this.loaihop || !this.loaigiay || !this.chieudai || !this.chieurong 
+            || !this.chieucao || !this.soluong) {
+          this.alert = true;
+          setTimeout(()=>{
+                this.alert=false
+          },1500)
+          return
+        }
+        const data = {
+          loaihop : this.loaihop,
+          loaigiay : this.loaigiay,
+          chieudai : this.chieudai,
+          chieurong : this.chieurong,
+          chieucao : this.chieucao,
+          soluong : this.soluong,
+          in : {
+                isprint : this.isprint,
+                mauin : this.mauin,
+                soluongmau : this.soluongmau
+              },
+          khuon: {
+            iskhuon : this.iskhuon,
+            giakhuon : this.giakhuon
+          }
+        }
+        // console.log(JSON.stringify(data))
+        await this.$axios.post('/api/calculate', data)
+        .then(function(res)
+        {
+          console.log('SUCCESS!!');
+          console.log(res.data)
+          this.gia = 100
+        })
+        .catch(function()
+        {
+          console.log('FAILURE!!');
+        });
       }
     }
   };
