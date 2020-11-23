@@ -3,8 +3,9 @@ export default function ({ $axios, redirect, $cookies}) {
     console.log('Making request to ' + config.url)
   })
 
-  //const token = $cookies.get('token')
-  // console.log(token)
-  //$axios.setToken(token, 'Bearer')
-  //$axios.setHeader('Content-Type', 'application/json')
+  const auth = $cookies.get('auth')
+  if (auth) {
+      $axios.setToken(auth.token, 'Bearer')
+      $axios.setHeader('Content-Type', 'application/json')
+  }
 }

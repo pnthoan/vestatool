@@ -206,21 +206,21 @@
         const data = {
           loaihop : this.loaihop,
           loaigiay : this.loaigiay,
-          chieudai : this.chieudai,
-          chieurong : this.chieurong,
-          chieucao : this.chieucao,
-          soluong : this.soluong,
+          chieudai : parseFloat(this.chieudai),
+          chieurong : parseFloat(this.chieurong),
+          chieucao : parseFloat(this.chieucao),
+          soluong : parseInt(this.soluong),
           in : {
                 isprint : this.isprint,
                 mauin : this.mauin,
-                soluongmau : this.soluongmau
+                soluongmau : parseInt(this.soluongmau)
               },
           khuon: {
             iskhuon : this.iskhuon,
-            giakhuon : this.giakhuon
+            giakhuon : parseFloat(this.giakhuon)
           }
         }
-        // console.log(JSON.stringify(data))
+        console.log(JSON.stringify(data))
         await this.$axios.post('/api/calculate', data)
         .then(function(res)
         {
