@@ -87,6 +87,7 @@
 
 <script>
   export default {
+    middleware: 'authenticated',
     data: () => ({
       dialog: false,
       dialogDelete: false,
@@ -130,7 +131,11 @@
       },
     },
 
-    async asyncData({ $axios }) {
+    async asyncData({ $axios, $cookies,$router}) {
+      const auth = $cookies.get('auth')
+      console.log("giay:" + JSON.stringify(auth))
+      $axios.setToken(auth.token, 'Bearer')
+      $axios.setHeader('Content-Type', 'application/json')
       const giays = await $axios.$get('/api/giay')
       let item = []
       var ele

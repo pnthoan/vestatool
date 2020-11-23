@@ -46,7 +46,7 @@ export default {
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    baseURL: 'http://ebox-dev.triti.top',
+    baseURL: 'https://ebox-dev.triti.top',
   },
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)

@@ -206,6 +206,7 @@
 
 <script>
   export default {
+    middleware: 'authenticated',
     data: () => ({
       alert: false,
       dialog: false,
@@ -239,7 +240,11 @@
       }
     },
 
-    async asyncData({ $axios }) {
+    async asyncData({ $axios, $cookies}) {
+      const auth = $cookies.get('auth')
+      console.log("tileloinhuan:" + JSON.stringify(auth))
+      $axios.setToken(auth.token, 'Bearer')
+      $axios.setHeader('Content-Type', 'application/json')
       const hops = await $axios.$get('/api/hop')
       let item = []
       let ten_hop = []

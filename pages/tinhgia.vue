@@ -128,6 +128,7 @@
 
 <script>
   export default {
+    middleware: 'authenticated',
     data: () => ({
       alert: false,
       username: '',
@@ -155,7 +156,11 @@
       v => !!v
     ],
 
-    async asyncData({ $axios }) {
+    async asyncData({ $axios, $cookies}) {
+      const auth = $cookies.get('auth')
+      console.log("tinhgia:" + JSON.stringify(auth))
+      $axios.setToken(auth.token, 'Bearer')
+      $axios.setHeader('Content-Type', 'application/json')
       const hops = await $axios.$get('/api/hop')
       const giays = await $axios.$get('/api/giay')
       let loaihop = []
@@ -187,7 +192,7 @@
         this.giakhuon = 500000;
       }, 
 
-      async onSubmit()
+      async onSubmit({$axios})
       {
         console.log("On Submit function!");
         if (!this.loaihop || !this.loaigiay || !this.chieudai || !this.chieurong 

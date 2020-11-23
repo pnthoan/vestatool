@@ -47,6 +47,7 @@
 </template>
 
 <script>
+const Cookie = process.client ? require('js-cookie') : undefined
   export default {
     layout: 'login',
     data: () => ({
@@ -80,11 +81,15 @@
         const userdata = {username: this.username, password: this.password};
         await this.$axios.post('/api/login', userdata)
         .then(res => {
-          // console.log(JSON.stringify(res.data))
-          this.$cookies.set('token', res.data.token, {sameSite:'None'});
-          this.$cookies.set('username', res.data.username, {sameSite:'None'});
-          this.$cookies.set('name', res.data.name, {sameSite:'None'});
-          this.$cookies.set('role', res.data.role, {sameSite:'None'});
+          console.log(JSON.stringify(res.data))
+          const auth = {
+            token: res.data.token,
+            username: res.data.username,
+            name: res.data.name,
+            role: res.data.role
+          }
+          this.$store.commit('setAuth', auth) // mutating to store for client rendering
+          Cookie.set('auth', auth) // saving token in cookie for server rendering
 
           this.$router.push('/tinhgia')
         })

@@ -105,6 +105,7 @@
 
 <script>
   export default {
+    middleware: 'authenticated',
     data: () => ({
       dialog: false,
       dialogDelete: false,
@@ -155,7 +156,11 @@
       },
     },
 
-    async asyncData({ $axios }) {
+    async asyncData({ $axios, $cookies}) {
+      const auth = $cookies.get('auth')
+      console.log("nhanvien:" + JSON.stringify(auth))
+      $axios.setToken(auth.token, 'Bearer')
+      $axios.setHeader('Content-Type', 'application/json')
       const users = await $axios.$get('/api/user')
       let item = []
       var ele

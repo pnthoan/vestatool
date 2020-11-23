@@ -74,7 +74,9 @@ export default {
   },
   created() {
     console.log("create default!")
-    const role = this.$cookies.get('role');
+    const auth = this.$cookies.get('auth');
+    const role = auth.role;
+    // console.log("ROLE=" + role)
     if (role === 'Admin') {
       this.items = [
         {
