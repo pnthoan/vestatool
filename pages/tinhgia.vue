@@ -142,7 +142,7 @@
       chieucao: 0,
       soluong: 0,
       mauin: '',
-      soluongmau: 0,
+      soluongmau: 1,
       iskhuon: false,
       isprint: false,
       giakhuon: 500000,
@@ -150,7 +150,7 @@
       listloaihop: [],
       listloaigiay: [],
 
-      listmauin: ['0', '1', '2', '3', '4', '5', '6', '7', '8'],
+      listmauin: ['1', '2', '3', '4', '5', '6', '7', '8'],
     }),
     chieudaiRules: [
       v => !!v
@@ -158,7 +158,7 @@
 
     async asyncData({ $axios, $cookies}) {
       const auth = $cookies.get('auth')
-      console.log("tinhgia:" + JSON.stringify(auth))
+      // console.log("tinhgia:" + JSON.stringify(auth))
       $axios.setToken(auth.token, 'Bearer')
       $axios.setHeader('Content-Type', 'application/json')
       const hops = await $axios.$get('/api/hop')
@@ -173,13 +173,13 @@
       for (ele of giays) {
         loaigiay.push(ele.ma_giay)
       }
-      console.log(giays)
+      // console.log(giays)
       return {listloaihop: loaihop, listloaigiay: loaigiay};
     },
 
     methods: {
       onClose() {
-        console.log("onClose function!");
+        // console.log("onClose function!");
         this.loaihop = '';
         this.loaigiay = '';
         this.chieudai = 0;
@@ -187,14 +187,14 @@
         this.chieucao = 0;
         this.soluong = 0;
         this.mauin = '';
-        this.soluongmau = 0;
+        this.soluongmau = 1;
         this.khuon = false;
         this.giakhuon = 500000;
       }, 
 
       async onSubmit({$axios})
       {
-        console.log("On Submit function!");
+        // console.log("On Submit function!");
         if (!this.loaihop || !this.loaigiay || !this.chieudai || !this.chieurong 
             || !this.chieucao || !this.soluong) {
           this.alert = true;
@@ -220,18 +220,26 @@
             giakhuon : parseFloat(this.giakhuon)
           }
         }
-        console.log(JSON.stringify(data))
-        await this.$axios.post('/api/calculate', data)
+        // console.log(JSON.stringify(data))
+        const gia_ban = await this.$axios.post('/api/calculate', data)
         .then(function(res)
         {
           console.log('SUCCESS!!');
-          console.log(res.data)
-          this.gia = 100
+          // console.log(JSON.stringify(res))
+          return res.data.gia
         })
-        .catch(function()
-        {
-          console.log('FAILURE!!');
-        });
+        .catch(err => {
+          return -1;
+        })
+        if (gia_ban < 0) {
+          this.gia = 0
+          this.alert = true;
+          setTimeout(()=>{
+                this.alert=false
+          },1500)
+        } else {
+          this.gia = gia_ban
+        }
       }
     }
   };

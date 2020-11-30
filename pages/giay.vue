@@ -133,7 +133,7 @@
 
     async asyncData({ $axios, $cookies,$router}) {
       const auth = $cookies.get('auth')
-      console.log("giay:" + JSON.stringify(auth))
+      // console.log("giay:" + JSON.stringify(auth))
       $axios.setToken(auth.token, 'Bearer')
       $axios.setHeader('Content-Type', 'application/json')
       const giays = await $axios.$get('/api/giay')

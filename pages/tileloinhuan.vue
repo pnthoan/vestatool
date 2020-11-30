@@ -242,7 +242,7 @@
 
     async asyncData({ $axios, $cookies}) {
       const auth = $cookies.get('auth')
-      console.log("tileloinhuan:" + JSON.stringify(auth))
+      // console.log("tileloinhuan:" + JSON.stringify(auth))
       $axios.setToken(auth.token, 'Bearer')
       $axios.setHeader('Content-Type', 'application/json')
       const hops = await $axios.$get('/api/hop')
@@ -258,7 +258,7 @@
 
     methods: {
       findElement() {
-        console.log("findElement")
+        // console.log("findElement")
         var ele
         for (ele of this.items) {
           if (ele.loai_hop === this.loai_hop) {
@@ -285,7 +285,7 @@
           this.editedItem.he_so.push(el)
         }
 
-        console.log(JSON.stringify(this.editedItem.he_so));
+        // console.log(JSON.stringify(this.editedItem.he_so));
         // this.editedIndex = this.items.indexOf(item)
         this.editedIndex = 2
         // console.log(this.editedIndex)
@@ -294,8 +294,8 @@
       },
 
       deleteItem (item) {
-        console.log(JSON.stringify(item))
-        console.log(this.loai_hop)
+        // console.log(JSON.stringify(item))
+        // console.log(this.loai_hop)
         // this.editedIndex = this.items.indexOf(item)
         // this.editedItem = Object.assign({}, item)
         this.so_lop = item.so_lop
@@ -318,10 +318,10 @@
           if (this.so_lop !== "All") {
             so_lop_cv = parseInt(this.so_lop)
           }
-          console.log("pnthoan: " + so_lop_cv + ":" + this.so_lop)
+          // console.log("pnthoan: " + so_lop_cv + ":" + this.so_lop)
           for (sl_idx in ln){
             if (parseInt(ln[sl_idx].so_lop) === so_lop_cv) {
-              console.log('Found thong tin so_lop = ' + ln[sl_idx].so_lop);
+              // console.log('Found thong tin so_lop = ' + ln[sl_idx].so_lop);
               ln.splice(sl_idx, 1)
             }
           }
@@ -341,37 +341,18 @@
         this.closeDelete()
       },
 
-      // close () {
-      //   this.dialog = false
-      //   console.log("closeFunc")
-      //   // this.$nextTick(() => {
-      //   //   this.editedItem = Object.assign({}, this.defaultItem)
-      //   //   this.editedIndex = -1
-      //   // })
-      // },
-
       closeDelete () {
         this.dialogDelete = false
         console.log("closeDeleteFunc")
-        // this.$nextTick(() => {
-        //   this.editedItem = Object.assign({}, this.defaultItem)
-        //   this.editedIndex = -1
-        // })
       },
 
       save () {
         console.log("save function")
-        // if (this.editedIndex > -1) {
-        //   Object.assign(this.items[this.editedIndex], this.editedItem)
-        // } else {
-        //   this.items.push(this.editedItem)
-        // }
-        // this.close()
       },
 
       async exportFunc() {
         console.log("exportFunc")
-        console.log(JSON.stringify(this.editedItem));
+        // console.log(JSON.stringify(this.editedItem));
         const res_data = await this.$axios.post('/api/export', this.editedItem)
         .then(function(res) {
           console.log('SUCCESS!!');
@@ -381,7 +362,7 @@
           console.log('FAILURE!!');
         });
 
-        console.log(res_data)
+        // console.log(res_data)
         await this.$axios({
             url: 'uploads/' + res_data,
             method: 'GET',
@@ -401,17 +382,17 @@
       importFunc(){
         this.dialog_import = true;
         this.dialog = false;
-        console.log("importFunc")
-        console.log(this.so_lop + " : " + this.loai_hop);
+        // console.log("importFunc")
+        // console.log(this.so_lop + " : " + this.loai_hop);
       },
 
       async upload ({ $axios }) {
-        console.log("Upload")
-        console.log(this.so_lop + " : " + this.loai_hop);
+        // console.log("Upload")
+        // console.log(this.so_lop + " : " + this.loai_hop);
         this.loading = true;
         let formData = new FormData();
         for (let file of this.files) {
-          console.log(file.name)
+          // console.log(file.name)
           var reader = new FileReader();
           reader.onloadend = function (e) {
             const dataURL = reader.result;
@@ -428,7 +409,7 @@
           }
 
           while(reader.readyState != 2) {
-            console.log("state" + reader.readyState)
+            // console.log("state" + reader.readyState)
             await sleep(1);
           }
 
@@ -455,8 +436,7 @@
             this.editedItem.he_so.push(el)
           }
 
-          console.log(JSON.stringify(this.editedItem.he_so));
-
+          // console.log(JSON.stringify(this.editedItem.he_so));
           // setTimeout(this.close(), 3000)
           this.loading = false;
           this.dialog_import = false;
@@ -492,7 +472,7 @@
 
       async saveFunc() {
         console.log("saveFunc");
-        console.log(JSON.stringify(this.editedItem.he_so));
+        // console.log(JSON.stringify(this.editedItem.he_so));
 
         const index = this.getMatchItem(this.loai_hop);
 

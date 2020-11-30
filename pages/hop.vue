@@ -112,7 +112,7 @@
 
     async asyncData({ $axios, $cookies}) {
       const auth = $cookies.get('auth')
-      console.log("Hop:" + JSON.stringify(auth))
+      // console.log("Hop:" + JSON.stringify(auth))
       $axios.setToken(auth.token, 'Bearer')
       $axios.setHeader('Content-Type', 'application/json')
       const hops = await $axios.$get('/api/hop')

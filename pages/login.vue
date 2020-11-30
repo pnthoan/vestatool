@@ -2,7 +2,7 @@
   <div>
     <v-dialog
       v-model="dialog"
-      max-width="80%"
+      max-width="500px"
       persistent
     >
       <v-card>
@@ -81,7 +81,7 @@ const Cookie = process.client ? require('js-cookie') : undefined
         const userdata = {username: this.username, password: this.password};
         await this.$axios.post('/api/login', userdata)
         .then(res => {
-          console.log(JSON.stringify(res.data))
+          // console.log(JSON.stringify(res.data))
           const auth = {
             token: res.data.token,
             username: res.data.username,
