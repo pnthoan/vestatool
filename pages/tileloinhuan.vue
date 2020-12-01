@@ -82,6 +82,7 @@
           <v-spacer></v-spacer>
           <span>
             <v-btn v-if="editedIndex!==-1" class="ma-2" outlined color="indigo" dark @click="exportFunc">Export</v-btn>
+            <input id="fileElem" class="ma-2 form-control" type="file" :accept="SheetJSFT" @change="_change" style="display:none"/>
             <v-btn class="ma-2" outlined color="indigo" dark @click="importFunc">Import</v-btn>
           </span>
         </v-card-title>
@@ -134,68 +135,6 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialog_import" persistent max-width="600px">
-      <v-card>
-        <v-card-title>
-          <span class="headline" style="color:#1E88E5;">Import</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-file-input
-              v-model="files"
-              color="deep-purple accent-4"
-              counter
-              label="File input"
-              multiple
-              placeholder="Select your files"
-              prepend-icon="mdi-paperclip"
-              outlined
-              :show-size="1000"
-            >
-              <template v-slot:selection="{ index, text }">
-                <v-chip
-                  v-if="index < 2"
-                  color="deep-purple accent-4"
-                  dark
-                  label
-                  small
-                >
-                  {{ text }}
-                </v-chip>
-
-                <span
-                  v-else-if="index === 2"
-                  class="overline grey--text text--darken-3 mx-2"
-                >
-                  +{{ files.length - 2 }} File(s)
-                </span>
-              </template>
-            </v-file-input>
-
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="closeImportFunc"
-          >
-            Close
-          </v-btn>
-          <v-btn
-            :loading="loading"
-            :disabled="loading"
-            color="blue darken-1"
-            text
-            @click="upload"
-          >
-            Submit
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
     <v-dialog v-model="alert" max-width="50%">
       <v-alert type="error">
         Something wrong!
@@ -205,20 +144,24 @@
 </template>
 
 <script>
+const make_cols = refstr => Array(XLSX.utils.decode_range(refstr).e.c + 1).fill(0).map((x,i) => ({name:XLSX.utils.encode_col(i), key:i}));
+const _SheetJSFT = [
+  "xlsx", "xlsb", "xlsm", "xls", "xml", "csv", "txt", "ods", "fods", "uos", "sylk", "dif", "dbf", "prn", "qpw", "123", "wb*", "wq*", "html", "htm"
+].map(function(x) { return "." + x; }).join(",");
+
   export default {
     middleware: 'authenticated',
     data: () => ({
+      SheetJSFT: _SheetJSFT,
       alert: false,
       dialog: false,
       loading: false,
-      dialog_import: false,
       dialogDelete: false,
       headers: [
         { text: 'Số Lớp', value: 'so_lop', class: 'loai-hop-class'},
         { text: 'Actions', value: 'actions', class: 'actions-size', sortable: false }
       ],
       items: [],
-      files: [],
       so_lop: 'All',
       solops:['3', '5', '7', 'All'],
       loai_hop: '',
@@ -262,7 +205,7 @@
         var ele
         for (ele of this.items) {
           if (ele.loai_hop === this.loai_hop) {
-            console.log(ele)
+            // console.log(ele)
             return ele.loi_nhuan
           }
         }
@@ -285,19 +228,11 @@
           this.editedItem.he_so.push(el)
         }
 
-        // console.log(JSON.stringify(this.editedItem.he_so));
-        // this.editedIndex = this.items.indexOf(item)
         this.editedIndex = 2
-        // console.log(this.editedIndex)
-        // this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        // console.log(JSON.stringify(item))
-        // console.log(this.loai_hop)
-        // this.editedIndex = this.items.indexOf(item)
-        // this.editedItem = Object.assign({}, item)
         this.so_lop = item.so_lop
         this.dialogDelete = true
       },
@@ -315,27 +250,40 @@
           var ln = this.items[index].loi_nhuan
           let sl_idx
           var so_lop_cv = 0
+          // If so_lop is ALL --> convert to 0
           if (this.so_lop !== "All") {
             so_lop_cv = parseInt(this.so_lop)
           }
-          // console.log("pnthoan: " + so_lop_cv + ":" + this.so_lop)
+
+          // Create new array to save other element except deleted one.
+          var lnhuan = []
           for (sl_idx in ln){
             if (parseInt(ln[sl_idx].so_lop) === so_lop_cv) {
-              // console.log('Found thong tin so_lop = ' + ln[sl_idx].so_lop);
-              ln.splice(sl_idx, 1)
+              continue
             }
+            lnhuan.push(ln[sl_idx])
           }
-          const data = {loi_nhuan: ln}
+          const data = {loi_nhuan: lnhuan}
 
+          // Query to server to update database
           await this.$axios.put('/api/hop/' + this.items[index]._id, data)
           .then(function(res)
           {
-            console.log('SUCCESS!!');
-            // console.log(res.data)
+            // Update local data
+            for (sl_idx in ln){
+              if (parseInt(ln[sl_idx].so_lop) === so_lop_cv) {
+                ln.splice(sl_idx, 1)
+              }
+            }
+            return;
           })
           .catch(function()
           {
-            console.log('FAILURE!!');
+            this.alert = true;
+            setTimeout(()=>{
+                  this.alert=false
+            },1500)
+            return;
           });
         }
         this.closeDelete()
@@ -352,109 +300,49 @@
 
       async exportFunc() {
         console.log("exportFunc")
-        // console.log(JSON.stringify(this.editedItem));
-        const res_data = await this.$axios.post('/api/export', this.editedItem)
-        .then(function(res) {
-          console.log('SUCCESS!!');
-          return res.data
-        })
-        .catch(function(){
-          console.log('FAILURE!!');
-        });
-
-        // console.log(res_data)
-        await this.$axios({
-            url: 'uploads/' + res_data,
-            method: 'GET',
-            responseType: 'blob',
-        }).then((response) => {
-             var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-             var fileLink = document.createElement('a');
-
-             fileLink.href = fileURL;
-             fileLink.setAttribute('download', res_data);
-             document.body.appendChild(fileLink);
-
-             fileLink.click();
-        });
+        console.log(JSON.stringify(this.editedItem.he_so));
+        const ws = XLSX.utils.aoa_to_sheet(this.editedItem.he_so);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "SheetJS");
+        /* generate file and send to client */
+        XLSX.writeFile(wb, "export_data.xlsx");
       },
 
       importFunc(){
-        this.dialog_import = true;
-        this.dialog = false;
-        // console.log("importFunc")
-        // console.log(this.so_lop + " : " + this.loai_hop);
-      },
-
-      async upload ({ $axios }) {
-        // console.log("Upload")
-        // console.log(this.so_lop + " : " + this.loai_hop);
-        this.loading = true;
-        let formData = new FormData();
-        for (let file of this.files) {
-          // console.log(file.name)
-          var reader = new FileReader();
-          reader.onloadend = function (e) {
-            const dataURL = reader.result;
-            formData.data = dataURL;
-            // console.log(JSON.stringify(formData));
-          }
-
-          if (file) {
-            reader.readAsDataURL(file)
-          }
-
-          function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-          }
-
-          while(reader.readyState != 2) {
-            // console.log("state" + reader.readyState)
-            await sleep(1);
-          }
-
-          const res_data = await this.$axios.post('/api/upload',
-              {
-                data : formData,
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                file: file.name
-              }
-          )
-          .then(function(res) {
-            console.log('SUCCESS!!');
-            return res.data;
-          })
-          .catch(function(){
-            console.log('FAILURE!!');
-          });
-
-          this.editedItem.he_so = []
-          let el;
-          for (el of res_data) {
-            this.editedItem.he_so.push(el)
-          }
-
-          // console.log(JSON.stringify(this.editedItem.he_so));
-          // setTimeout(this.close(), 3000)
-          this.loading = false;
-          this.dialog_import = false;
-          this.dialog = true;
+        // this.dialog = false;
+        console.log("importFunc")
+        if (process.client) {
+          document.getElementById("fileElem").click()
         }
       },
 
-      close () {
-        console.log("Close");
-        this.dialog_import = false;
-        // this.loading = false;
-        this.dialog = false;
+      _change(evt) {
+        const file = evt.target.files;
+        if(file && file[0]) this._file(file[0]);
+        evt.target.value = '';
+      },
+
+      _file(file) {
+        /* Boilerplate to set up FileReader */
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          /* Parse data */
+          const bstr = e.target.result;
+          const wb = XLSX.read(bstr, {type:'binary'});
+          /* Get first worksheet */
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+          /* Convert array of arrays */
+          const data = XLSX.utils.sheet_to_json(ws, {header:1});
+          /* Update state */
+          this.editedItem.he_so = data
+        };
+        reader.readAsBinaryString(file);
       },
 
       cancelFunc() {
         console.log("cancelFunc");
         this.loading = false;
-        this.dialog_import = false;
         this.dialog = false;
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -536,14 +424,6 @@
         this.dialog = false;
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
-        this.files = [];
-      },
-
-      closeImportFunc() {
-        console.log("closeImportFunc");
-        this.dialog_import = false;
-        this.files = [];
-        this.dialog = true;
       }
     },
   };
