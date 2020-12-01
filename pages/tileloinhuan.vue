@@ -185,7 +185,6 @@ const _SheetJSFT = [
 
     async asyncData({ $axios, $cookies}) {
       const auth = $cookies.get('auth')
-      // console.log("tileloinhuan:" + JSON.stringify(auth))
       $axios.setToken(auth.token, 'Bearer')
       $axios.setHeader('Content-Type', 'application/json')
       const hops = await $axios.$get('/api/hop')
@@ -201,11 +200,9 @@ const _SheetJSFT = [
 
     methods: {
       findElement() {
-        // console.log("findElement")
         var ele
         for (ele of this.items) {
           if (ele.loai_hop === this.loai_hop) {
-            // console.log(ele)
             return ele.loi_nhuan
           }
         }
@@ -300,7 +297,6 @@ const _SheetJSFT = [
 
       async exportFunc() {
         console.log("exportFunc")
-        console.log(JSON.stringify(this.editedItem.he_so));
         const ws = XLSX.utils.aoa_to_sheet(this.editedItem.he_so);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "SheetJS");
@@ -309,7 +305,6 @@ const _SheetJSFT = [
       },
 
       importFunc(){
-        // this.dialog = false;
         console.log("importFunc")
         if (process.client) {
           document.getElementById("fileElem").click()
@@ -360,7 +355,6 @@ const _SheetJSFT = [
 
       async saveFunc() {
         console.log("saveFunc");
-        // console.log(JSON.stringify(this.editedItem.he_so));
 
         const index = this.getMatchItem(this.loai_hop);
         if (index < 0)
@@ -381,8 +375,15 @@ const _SheetJSFT = [
 
           if (this.so_lop !== "All") {
             so_lop_cv = parseInt(this.so_lop)
-          } 
-          for (sl of ln){
+          }
+
+          // Clone
+          let lnhuan = []
+          for (sl of ln) {
+            lnhuan.push(sl)
+          }
+
+          for (sl of lnhuan){
             if (parseInt(sl.so_lop) === so_lop_cv) {
               if (this.editedIndex === -1) { //add
                 console.log('Da co thong tin so_lop = ' + this.so_lop);
@@ -400,22 +401,26 @@ const _SheetJSFT = [
 
           }
 
-         const content = {
+          const content = {
             he_so: JSON.stringify(this.editedItem.he_so),
             so_lop: so_lop_cv
           };
 
           if (!found) { // add new
-            ln.push(content)
+            lnhuan.push(content)
           }
 
-          const data = {loi_nhuan: ln}
+          const data = {loi_nhuan: lnhuan}
 
           await this.$axios.put('/api/hop/' + this.items[index]._id, data)
           .then(function(res)
           {
             console.log('SUCCESS!!');
-            // console.log(res.data)
+            if (found) {
+              sl.he_so = JSON.stringify(this.editedItem.he_so)
+            } else {
+              ln.push(content)
+            }
           })
           .catch(function()
           {
