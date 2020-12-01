@@ -363,10 +363,13 @@ const _SheetJSFT = [
         // console.log(JSON.stringify(this.editedItem.he_so));
 
         const index = this.getMatchItem(this.loai_hop);
-
         if (index < 0)
         {
           console.log("Not found item!");
+          this.alert = true;
+          setTimeout(()=>{
+                this.alert=false
+          },1500)
         }
         else
         {
